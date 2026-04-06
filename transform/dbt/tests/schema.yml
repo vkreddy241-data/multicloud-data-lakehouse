@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: "Staged transactions unified from all 3 clouds"
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: amount
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: source_cloud
+        tests:
+          - accepted_values:
+              values: ['aws', 'azure', 'gcp']
+
+  - name: mart_revenue_by_cloud
+    columns:
+      - name: total_revenue
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: completion_rate_pct
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+sources:
+  - name: silver
+    description: "Silver Delta Lake tables via Redshift Spectrum"
+    tables:
+      - name: transactions
+        freshness:
+          warn_after:  {count: 6,  period: hour}
+          error_after: {count: 24, period: hour}
+        loaded_at_field: ingested_at

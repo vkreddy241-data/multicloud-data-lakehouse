@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+.pytest_cache/
+.coverage
+coverage.xml
+*.log
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+dbt/target/
+dbt/logs/
